@@ -2,6 +2,8 @@ class ItemsController < ApplicationController
   def index
     @items = Item.all
 
+    @order = Order.new
+
     respond_to do |format|
       format.html
       format.json { render :json => @items }
@@ -10,6 +12,8 @@ class ItemsController < ApplicationController
 
   def show
     @item = Item.find(params[:id])
+
+    @order = Order.new
 
     respond_to do |format|
       format.html

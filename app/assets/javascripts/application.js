@@ -100,6 +100,12 @@ $(function() {
           $("#cart-total").html(self.cartTotal());
           sessionStorage.setItem("shopping-cart", JSON.stringify(self.cartItems));
         });
+
+        $("#checkout").click(function() {
+          $("#checkout-button").hide();
+          $("#submit-order").show();
+          self.checkout();
+        });
       })();
 
       self.addToCart = function(button) {
@@ -137,6 +143,29 @@ $(function() {
         });
       };
 
+      self.checkout = function(){
+        var orderItemsDiv = $("#order-items");
+
+        $(self.cartItems).each(function(){
+          var randomKey = new Date().getTime();
+
+          var itemIdInput = $("<input>");
+          itemIdInput.attr("type", "hidden");
+          itemIdInput.attr("name", "order[order_items_attributes][" +
+            randomKey + "][item_id]");
+          itemIdInput.val(this.id);
+
+          var itemQuantityInput = $("<input>");
+          itemQuantityInput.attr("type", "hidden");
+          itemQuantityInput.attr("name", "order[order_items_attributes][" +
+            randomKey + "][quantity]");
+          itemQuantityInput.val(this.quantity);
+
+          orderItemsDiv.append(itemIdInput);
+          orderItemsDiv.append(itemQuantityInput);
+        });
+      };
+
     };
     // bind listeners to cartAdd function
     // load anything already in session[:cart]
@@ -145,16 +174,9 @@ $(function() {
     // update cart
     // clear cart
 
-    function Checkout() {};
-    // collect user information
-    // create order
-    // add order_items
-    // clear cart
-
     return {
       Item: Item,
-      Cart: Cart,
-      Checkout: Checkout
+      Cart: Cart
     }
 
   };
