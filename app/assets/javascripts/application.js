@@ -93,10 +93,12 @@ $(function() {
         $(".add-to-cart").click(function() {
           self.addToCart(this);
           self.renderCart();
+          sessionStorage.setItem("shopping-cart", JSON.stringify(self.cartItems));
         });
 
         $("#shopping-cart").focusout(function() {
           $("#cart-total").html(self.cartTotal());
+          sessionStorage.setItem("shopping-cart", JSON.stringify(self.cartItems));
         });
       })();
 
@@ -129,6 +131,12 @@ $(function() {
         $("#cart-total").html(self.cartTotal());
       };
 
+      self.populateFromSession = function(objects) {
+        $(objects).each(function() {
+          self.cartItems.push(new Item(this, this.quantity));
+        });
+      };
+
     };
     // bind listeners to cartAdd function
     // load anything already in session[:cart]
@@ -151,9 +159,12 @@ $(function() {
 
   };
 
-  $.getJSON('items.json', function(data) {
+  $.getJSON('/items.json', function(data) {
     var store = new Store(data);
-
     var cart = new store.Cart($("#shopping-cart"));
+    var storageItems = JSON.parse(sessionStorage.getItem("shopping-cart")) || [];
+
+    cart.populateFromSession(storageItems);
+    cart.renderCart();
   });
 });
