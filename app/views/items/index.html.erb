@@ -1,3 +1,16 @@
+<div id="carrousel">
+  <ul>
+    <% @items.each do |item| %>
+    <li>
+      <img src="<%= item.picture_url %>">
+      <br>
+      <strong><%= item.name %></strong>
+    </li>
+    <% end %>
+  </ul>
+</div>
+
+
 <% @items.each do |item| %>
   <div id="item_<%= item.id %>">
     <h3><%= item.name %></h3>
