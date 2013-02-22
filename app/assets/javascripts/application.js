@@ -85,7 +85,6 @@ $(function() {
         $(self.cartItems).each(function(){
           total += this.cartTotal();
         });
-        console.log(total);
         return total;
       };
 
@@ -105,6 +104,10 @@ $(function() {
           $("#checkout-button").hide();
           $("#submit-order").show();
           self.checkout();
+        });
+
+        $("#place-order").click(function() {
+          self.postOrder();
         });
       })();
 
@@ -146,7 +149,7 @@ $(function() {
       self.checkout = function(){
         var orderItemsDiv = $("#order-items");
 
-        $(self.cartItems).each(function(){
+        $(self.cartItems).each(function() {
           var randomKey = new Date().getTime();
 
           var itemIdInput = $("<input>");
@@ -165,6 +168,39 @@ $(function() {
           orderItemsDiv.append(itemQuantityInput);
         });
       };
+
+      self.collectOrder = function() {
+        var inputs = $("#order-form").find("input");
+        var postObj = {
+          order: { order_items_attributes : {} }
+        };
+
+        inputs.each(function(){
+          postObj.order[$(this).attr("name")] = $(this).val();
+        });
+
+        console.log(self.cartItems);
+
+        $(self.cartItems).each(function() {
+          if (this.quantity !== 0) {
+            postObj.order.order_items_attributes[this.id] = {
+              quantity: this.quantity,
+              item_id: this.id
+            }
+          }
+        });
+
+        return postObj;
+      };
+
+      self.postOrder = function() {
+        var postHash = self.collectOrder();
+        $.post("/orders", postHash, function(data) {
+          sessionStorage.removeItem("shopping-cart");
+          self.cartItems = [];
+          self.renderCart();
+        });
+      }
 
     };
     // bind listeners to cartAdd function

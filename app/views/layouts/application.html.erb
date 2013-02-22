@@ -27,20 +27,15 @@
         <div id="submit-order">
           <hr>
           <h4>Place Your Order</h4>
-          <%= simple_form_for @order, :remote => true do |f| %>
-            <%= f.input :name %>
-            <%= f.input :email %>
-            <%= f.input :address %>
-            <%= f.input :city %>
-            <%= f.input :state %>
-            <%= f.input :zip %>
-            <%= simple_fields_for :order_items, :id=>"order-items" do |order_item_f| %>
-              <div id="order-items">
-              </div>
-            <% end %>
-
-            <%= f.submit "Submit Order", :class => "btn btn-primary", :confirm => "Ready to take us home?" %>
-          <% end %>
+          <form class="form-horizontal" id="order-form">
+            <label>Name: <input type="text" name="name" placeholder="Enter your name"></label>
+            <label>E-Mail: <input type="text" name="email" placeholder="name@domain.com"></label>
+            <label>Address: <input type="text" name="address" placeholder="street address"></label>
+            <label>City: <input type="text" name="city" placeholder="City"></label>
+            <label>State: <input type="text" name="state" placeholder="State"></label>
+            <label>Zip: <input type="text" name="zip" placeholder="Zip Code"></label>
+            <button type="button" class="btn btn-primary" id="place-order">Place Order</button>
+          </form>
         </div>
       </div>
     </div>

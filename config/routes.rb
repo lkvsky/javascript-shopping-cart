@@ -1,4 +1,4 @@
 Store::Application.routes.draw do
   resources :items
-  resources :orders
+  resources :orders, :only => :create
 end
