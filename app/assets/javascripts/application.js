@@ -14,11 +14,6 @@
 //= require jquery_ujs
 //= require_tree .
 
-      // <form class="form-inline">
-      //   <input class="quantity" type="number" value="1"></input>
-      //   <button type="button" class="btn btn-primary add-to-cart">Add to Cart</button>
-      // </form>
-
 $(function() {
 
   var Store = function(items) {
@@ -103,7 +98,6 @@ $(function() {
         $("#checkout").click(function() {
           $("#checkout-button").hide();
           $("#submit-order").show();
-          self.checkout();
         });
 
         $("#place-order").click(function() {
@@ -146,29 +140,6 @@ $(function() {
         });
       };
 
-      self.checkout = function(){
-        var orderItemsDiv = $("#order-items");
-
-        $(self.cartItems).each(function() {
-          var randomKey = new Date().getTime();
-
-          var itemIdInput = $("<input>");
-          itemIdInput.attr("type", "hidden");
-          itemIdInput.attr("name", "order[order_items_attributes][" +
-            randomKey + "][item_id]");
-          itemIdInput.val(this.id);
-
-          var itemQuantityInput = $("<input>");
-          itemQuantityInput.attr("type", "hidden");
-          itemQuantityInput.attr("name", "order[order_items_attributes][" +
-            randomKey + "][quantity]");
-          itemQuantityInput.val(this.quantity);
-
-          orderItemsDiv.append(itemIdInput);
-          orderItemsDiv.append(itemQuantityInput);
-        });
-      };
-
       self.collectOrder = function() {
         var inputs = $("#order-form").find("input");
         var postObj = {
@@ -178,8 +149,6 @@ $(function() {
         inputs.each(function(){
           postObj.order[$(this).attr("name")] = $(this).val();
         });
-
-        console.log(self.cartItems);
 
         $(self.cartItems).each(function() {
           if (this.quantity !== 0) {
@@ -199,16 +168,12 @@ $(function() {
           sessionStorage.removeItem("shopping-cart");
           self.cartItems = [];
           self.renderCart();
+          $("#checkout-button").show();
+          $("#submit-order").hide();
         });
       }
 
     };
-    // bind listeners to cartAdd function
-    // load anything already in session[:cart]
-    // append base information to the sidebar
-    // start by fetching items json
-    // update cart
-    // clear cart
 
     return {
       Item: Item,
