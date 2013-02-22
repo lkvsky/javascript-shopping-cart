@@ -32,25 +32,44 @@ $(function() {
       self.price = obj.price;
       self.quantity = quantity;
 
+      self.cartTotal = function() {
+        return self.price * self.quantity;
+      };
+
       self.cartTemplate = function() {
-        var total = self.quantity * self.price;
         var cartHtml = "<strong>" + self.name + "</strong> \
           <br> \
           <img class='cart-img' src='" + self.picture_url + "'> \
-          <p><strong>Quantity:</strong> " + self.quantity + "</p> \
-          <p><strong>Total:</strong> $" + total + ".00</p>";
+          <p><strong>Total:</strong>\
+          $<span class='item-total'>" + self.cartTotal() + "</span>.00</p>\
+          <p><strong>Quantity:</strong>\
+          <input class='item-quantity' type='number' value='" + self.quantity + "'></p>";
 
         var cartDiv = $("<div>").attr("id", "cart_" + self.id);
         cartDiv.html(cartHtml);
 
+        self.addListener(cartDiv);
+
         return cartDiv;
-      }
+      };
+
+      self.addListener = function(cartDiv){
+        $(cartDiv).find(".item-quantity").focusout(function() {
+          if ($(this).val() < 1) {
+            $(this).val(0);
+          }
+          self.quantity = $(this).val();
+          $(this).closest(cartDiv).find(".item-total").html(self.cartTotal());
+        });
+      };
     };
 
-    Item.find = function(id) {
-      for (var i = 0; i < items.length; i++) {
-        if (items[i].id === id) {
-          return items[i];
+    Item.find = function(id, source) {
+      var source = source || items;
+
+      for (var i = 0; i < source.length; i++) {
+        if (source[i].id === id) {
+          return source[i];
         }
       }
     };
@@ -60,12 +79,25 @@ $(function() {
 
       self.cartItems = [];
 
+      self.cartTotal = function() {
+        var total = 0;
+
+        $(self.cartItems).each(function(){
+          total += this.cartTotal();
+        });
+        console.log(total);
+        return total;
+      };
+
       self.bindListeners = (function() {
         $(".add-to-cart").click(function() {
           self.addToCart(this);
           self.renderCart();
         });
 
+        $("#shopping-cart").focusout(function() {
+          $("#cart-total").html(self.cartTotal());
+        });
       })();
 
       self.addToCart = function(button) {
@@ -77,8 +109,14 @@ $(function() {
           quantity = 1
         }
 
-        var item = new Item(Item.find(itemId), quantity);
-        self.cartItems.push(item);
+        if (Item.find(itemId, self.cartItems)) {
+          var item = Item.find(itemId, self.cartItems);
+          var itemQuantity = parseInt(item.quantity) + parseInt(quantity);
+          item.quantity = itemQuantity;
+        } else {
+          var item = new Item(Item.find(itemId), quantity);
+          self.cartItems.push(item);
+        }
       };
 
       self.renderCart = function() {
@@ -87,6 +125,8 @@ $(function() {
         $(self.cartItems).each(function() {
           el.append(this.cartTemplate());
         });
+
+        $("#cart-total").html(self.cartTotal());
       };
 
     };
@@ -114,6 +154,6 @@ $(function() {
   $.getJSON('items.json', function(data) {
     var store = new Store(data);
 
-    var cart = new store.Cart($("#sidebar"));
+    var cart = new store.Cart($("#shopping-cart"));
   });
 });
